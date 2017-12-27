@@ -23,7 +23,6 @@ class Realsense(SensorBase):
                (self.device.colour_intrinsics.ppx, self.device.colour_intrinsics.ppy),
                (self.device.colour_intrinsics.width, self.device.colour_intrinsics.height),
                distortion)
-        print(camera)
         return camera
 
     def get_frame(self, block=True):
