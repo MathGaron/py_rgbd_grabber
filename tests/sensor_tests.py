@@ -1,12 +1,27 @@
 from py_rgbd_grabber.kinect2 import Kinect2
+from py_rgbd_grabber.realsense import Realsense
+import cv2
+import numpy as np
 
 if __name__ == '__main__':
-    import cv2
-    camera_parameters_path = "../py_rgbd_grabber/camera_calibration_files/Kinect2_lab_small.json"
-    sensor = Kinect2(camera_parameters_path)
-    sensor.start()
-    while True:
-        rgb, depth, timestamp = sensor.get_frame()
-        cv2.imshow("test", rgb)
-        cv2.waitKey(30)
-        sensor.stop()
+    #sensor = Kinect2()
+    sensor = Realsense()
+    # will manage the other process automagically
+    with sensor:
+
+        # main loop
+        while True:
+            frames = sensor.get_frames()
+            if len(frames) == 0:
+                # could sleep here
+                continue
+            # grab the last frame
+            frame = frames[-1]
+
+            # show and handle keyboard entries
+            cv2.imshow("rgb", frame.rgb[:, :, ::-1])
+            print(np.max(frame.depth))
+            cv2.imshow("depth", (frame.depth/np.max(frame.depth)*255).astype(np.uint8))
+            key = cv2.waitKey(10)
+            if key == 1048603:  # ESC
+                break

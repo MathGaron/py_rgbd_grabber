@@ -1,23 +1,89 @@
 import abc
+from enum import Enum
+import time
+
+from py_rgbd_grabber.camera import Camera
+from multiprocessing import Process, Queue
+
+
+class SensorMessage(Enum):
+    Stop = 0
 
 
 class SensorBase:
-    @abc.abstractmethod
-    def start(self):
-        pass
+    def __init__(self, max_buffer_size=-1):
+        self.max_buffer_size = max_buffer_size
 
     @abc.abstractmethod
-    def stop(self):
-        pass
-
-    @abc.abstractmethod
-    def intrinsics(self):
+    def initialize_(self):
         """
-        return CameraParameters
+        Everything to initialize the sensor on the other process
         :return:
         """
         pass
 
     @abc.abstractmethod
-    def get_frame(self, block=True):
+    def clean_(self):
+        """
+        Everything to clean the sensor on the other process
+        :return:
+        """
         pass
+
+    @abc.abstractmethod
+    def get_intrinsics(self):
+        """
+        return Camera object
+        :return:
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_frame_(self):
+        """
+        Return a frame (single object), will run on the other process and pipe the frames to the main process
+        :return:
+        """
+        pass
+
+    def get_frames(self):
+        """
+        Return all frames processed on the other thread
+        :return:
+        """
+        output_frames = []
+        for i in range(self.frames.qsize()):
+            output_frames.append(self.frames.get(block=True, timeout=None))
+        return output_frames
+
+    def __enter__(self):
+        self.frames = Queue(self.max_buffer_size)
+        self.message_queue = Queue(10)
+        self.frames.cancel_join_thread()
+        self.message_queue.cancel_join_thread()
+        self.worker = Process(target=self.grabber_, args=(self.frames, self.message_queue))
+        self.worker.daemon = True
+        self.worker.start()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.message_queue.put(SensorMessage.Stop)
+        # TODO : hack, since the process is a deamon we dont want to terminate without cleaning...
+        # Bug with Kinect2 hanging when terminating the process..
+        time.sleep(1)
+
+    def grabber_(self, frames, message_queue):
+        self.initialize_()
+        while True:
+            frame = self.get_frame_()
+            frames.put(frame)
+            if message_queue.qsize():
+                message = message_queue.get()
+                if message == SensorMessage.Stop:
+                    break
+        self.clean_()
+
+    def set_intrinsics(self, camera):
+        self.camera = camera
+
+    def set_intrinsics_from_json(self, path):
+        self.camera = Camera.load_from_json(path)

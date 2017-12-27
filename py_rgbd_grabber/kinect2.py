@@ -1,10 +1,12 @@
+from py_rgbd_grabber.rgbd_frame import RgbdFrame
 from py_rgbd_grabber.sensorbase import SensorBase
-from py_rgbd_grabber.camera import Camera
-import pyfreenect2
+
 
 
 class Kinect2(SensorBase):
-    def __init__(self, camera_path):
+    def initialize_(self):
+        # boostrapping code in pyfreenect2 todo: fix this...
+        import pyfreenect2
         self.serial_number = pyfreenect2.getDefaultDeviceSerialNumber()
         self.device = pyfreenect2.Freenect2Device(self.serial_number)
         self.frame_listener = pyfreenect2.SyncMultiFrameListener(pyfreenect2.Frame.COLOR,
@@ -13,18 +15,16 @@ class Kinect2(SensorBase):
 
         self.device.setColorFrameListener(self.frame_listener)
         self.device.setIrAndDepthFrameListener(self.frame_listener)
-        self.camera = Camera.load_from_json(camera_path)
-
-    def start(self):
         success = self.device.start()
         self.registration = pyfreenect2.Registration(self.device)
         return success
 
-    def stop(self):
+    def clean_(self):
         self.device.stop()
 
     def intrinsics(self):
         """
+        TODO: implement bindings to get factory values
         ((1060.707250708333, 1058.608326305465),
         (956.354471815484, 518.9784429882449),
         (956.354471815484, 530),
@@ -33,8 +33,8 @@ class Kinect2(SensorBase):
         """
         return self.camera
 
-    def get_frame(self, block=True):
-        # TODO implement non blocking operation
+    def get_frame_(self):
+        import pyfreenect2
         frames = self.frame_listener.waitForNewFrame()
         rgbFrame = frames.getFrame(pyfreenect2.Frame.COLOR)
         depthFrame = frames.getFrame(pyfreenect2.Frame.DEPTH)
@@ -46,4 +46,4 @@ class Kinect2(SensorBase):
         self.frame_listener.release(frames)
 
         depth_frame[depth_frame == float('inf')] = 0
-        return rgb_frame, depth_frame, timestamp
+        return RgbdFrame(rgb_frame, depth_frame, timestamp)
