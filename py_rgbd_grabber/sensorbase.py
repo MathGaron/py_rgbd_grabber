@@ -56,6 +56,13 @@ class SensorBase:
             output_frames.append(self.frames.get(block=True, timeout=None))
         return output_frames
 
+    def pop_frame(self):
+        """
+        Return next frame in FIFO (Will block)
+        :return:
+        """
+        return self.frames.get(block=True, timeout=None)
+
     def __enter__(self):
         self.frames = Queue(self.max_buffer_size)
         self.message_queue = Queue(10)

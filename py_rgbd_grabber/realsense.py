@@ -5,6 +5,7 @@ import pyrealsense as pyrs
 from pyrealsense import stream
 # from pyrealsense.constants import rs_option
 
+
 class Realsense(SensorBase):
     def initialize_(self):
         self.serv = pyrs.Service()
