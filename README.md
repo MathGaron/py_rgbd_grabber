@@ -9,6 +9,8 @@ Simple python3 utility to get frames (asynchronously) from RGB-D sensors used fo
     with sensor:
         # Get the list of frames grabbed (empty list if there is no new frames)
         frames = sensor.get_frames()
+        # Or pop the last frame (will block until next frame)
+        frame = sensor.pop_frame()
 ```
 
 Frame contains an rgb numpy array [H, W, C], depth (mm) numpy array [H, W] and timestamp (s)
