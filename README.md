@@ -1,5 +1,5 @@
 # py_rgbd_grabber
-Simple python utility to get frames (asynchronously) from RGB-D sensors used for research. (Kinect2, Realsense)
+Simple python3 utility to get frames (asynchronously) from RGB-D sensors used for research. (Kinect2, Realsense)
 
 ## [Example](https://github.com/MathGaron/py_rgbd_grabber/blob/master/tests/sensor_tests.py)
 ```python
@@ -15,7 +15,7 @@ Frame contains an rgb numpy array [H, W, C], depth (mm) numpy array [H, W] and t
 
 ### Kinect2 dependencies
 - [libfreenect2](https://github.com/OpenKinect/libfreenect2)
-- [Bindings for libfreenect2](https://github.com/MathGaron/py3freenect2)
+- [Bindings for libfreenect2](https://github.com/MathGaron/py3freenect2) <- (Tested only with the linked fork)
 
 ### Realsense dependencies
 - [librealsense](https://github.com/IntelRealSense/librealsense#installation-guide)
