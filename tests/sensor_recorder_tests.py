@@ -20,7 +20,7 @@ if __name__ == '__main__':
     if not os.path.exists(save_path):
         os.mkdir(save_path)
     # Will be better to get width and height from sensor...
-    recorder = VideoRecorder(os.path.join(save_path, "video.avi"), 30, 960, 540)
+    recorder = VideoRecorder(os.path.join(save_path, "video.avi"), 25, 960, 540)
 
     # will manage the other process automagically
     with sensor, recorder:
@@ -36,11 +36,10 @@ if __name__ == '__main__':
             # do whatever with the frame
 
             # save the frame in another process
-            recorder.save_frame(frame)
+            recorder.save_frame(frame.rgb[:, :, ::-1])
 
             # show and handle keyboard entries
             cv2.imshow("rgb", frame.rgb[:, :, ::-1])
-            print(np.max(frame.depth))
             cv2.imshow("depth", (frame.depth/np.max(frame.depth)*255).astype(np.uint8))
             key = cv2.waitKey(10)
             if key == 1048603:  # ESC

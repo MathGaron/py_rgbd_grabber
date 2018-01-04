@@ -18,8 +18,8 @@ Currently support two rgbd sensors:
         frames = sensor.get_frames()
         # Or pop the last frame (will block until next frame)
         frame = sensor.pop_frame()
-        # Send frame to recorder
-        recorder.save_frame(frame)
+        # Send image to recorder
+        recorder.save_frame(frame.rgb)
 ```
 
 Frame contains an rgb numpy array [H, W, C], depth (mm) numpy array [H, W] and timestamp (s)

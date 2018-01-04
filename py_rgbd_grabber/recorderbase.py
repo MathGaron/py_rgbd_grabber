@@ -27,7 +27,7 @@ class RecorderBase:
     @abc.abstractmethod
     def save_frame_(self, frame):
         """
-        Receive a frame and execute save code
+        Receive an image (or whatever) and save it
         :return:
         """
         pass
@@ -37,13 +37,12 @@ class RecorderBase:
 
     def __enter__(self):
         self.frames = Queue(self.max_buffer_size)
-        self.frames.cancel_join_thread()
         self.worker = Process(target=self.saver_, args=(self.frames,))
-        self.worker.daemon = True
         self.worker.start()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.frames.put(None)
+        self.worker.join()
 
     def saver_(self, frames):
         self.initialize_()

@@ -38,6 +38,5 @@ class VideoRecorder(RecorderBase):
         Receive a frame and execute save code
         :return:
         """
-        #TODO chose between rgb/depth
-        self.encoder.write(frame.rgb[:, :, ::-1])
+        self.encoder.write(frame)
 
