@@ -12,6 +12,11 @@ class SensorMessage(Enum):
 
 class SensorBase:
     def __init__(self, preprocess_function=None, max_buffer_size=-1):
+        """
+
+        :param preprocess_function: Function that takes a frame and output a modified frame (will run on grabber process)
+        :param max_buffer_size:
+        """
         self.max_buffer_size = max_buffer_size
         self.preprocess_function = preprocess_function
 
