@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 
 if __name__ == '__main__':
-    #sensor = Kinect2()
-    sensor = Realsense()
+    sensor = Kinect2()
+    #sensor = Realsense()
     # will manage the other process automagically
     with sensor:
 

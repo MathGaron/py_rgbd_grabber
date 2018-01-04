@@ -11,8 +11,9 @@ class SensorMessage(Enum):
 
 
 class SensorBase:
-    def __init__(self, max_buffer_size=-1):
+    def __init__(self, preprocess_function=None, max_buffer_size=-1):
         self.max_buffer_size = max_buffer_size
+        self.preprocess_function = preprocess_function
 
     @abc.abstractmethod
     def initialize_(self):
@@ -82,6 +83,8 @@ class SensorBase:
         self.initialize_()
         while True:
             frame = self.get_frame_()
+            if self.preprocess_function is not None:
+                frame = self.preprocess_function(frame)
             frames.put(frame)
             if message_queue.qsize():
                 message = message_queue.get()

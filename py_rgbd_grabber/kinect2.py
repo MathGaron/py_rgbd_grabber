@@ -2,8 +2,10 @@ from py_rgbd_grabber.rgbd_frame import RgbdFrame
 from py_rgbd_grabber.sensorbase import SensorBase
 
 
-
 class Kinect2(SensorBase):
+    def __init__(self, preprocess_function=None, max_buffer_size=-1):
+        super(Kinect2, self).__init__(preprocess_function=preprocess_function, max_buffer_size=max_buffer_size)
+
     def initialize_(self):
         # boostrapping code in pyfreenect2 todo: fix this...
         import pyfreenect2
@@ -46,4 +48,7 @@ class Kinect2(SensorBase):
         self.frame_listener.release(frames)
 
         depth_frame[depth_frame == float('inf')] = 0
+
+
+
         return RgbdFrame(rgb_frame, depth_frame, timestamp)
