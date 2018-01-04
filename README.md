@@ -31,3 +31,10 @@ Frame contains an rgb numpy array [H, W, C], depth (mm) numpy array [H, W] and t
 ### Realsense dependencies
 - [librealsense](https://github.com/IntelRealSense/librealsense#installation-guide)
 - [Bindings for librealsense](https://github.com/toinsson/pyrealsense)
+
+## TODO
+- Recorder process could be based on a listener principle to have different recorder on the same process
+- Kinect2: implement function to get intrinsics from the driver
+
+## Contribution
+Write an issue or send a pull request!
