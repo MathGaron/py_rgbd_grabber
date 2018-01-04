@@ -7,6 +7,9 @@ from pyrealsense import stream
 
 
 class Realsense(SensorBase):
+    def __init__(self, preprocess_function=None, max_buffer_size=-1):
+        super(Realsense, self).__init__(preprocess_function=preprocess_function, max_buffer_size=max_buffer_size)
+
     def initialize_(self):
         self.serv = pyrs.Service()
         fps = 30
