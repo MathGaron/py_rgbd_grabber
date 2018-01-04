@@ -1,5 +1,5 @@
 # py_rgbd_grabber
-Simple python3 utility to get/save frames (asynchronously) from RGB-D sensors used for research.
+Simple python 3 utility to grab and save frames (asynchronously) from RGB-D sensors used for research.
 
 Currently support two rgbd sensors:
     - Kinect2
