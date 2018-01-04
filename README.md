@@ -1,16 +1,25 @@
 # py_rgbd_grabber
-Simple python3 utility to get frames (asynchronously) from RGB-D sensors used for research. (Kinect2, Realsense)
+Simple python3 utility to get/save frames (asynchronously) from RGB-D sensors used for research.
 
-## [Example](https://github.com/MathGaron/py_rgbd_grabber/blob/master/tests/sensor_tests.py)
+Currently support two rgbd sensors:
+    - Kinect2
+    - Realsense
+
+
+## Grab/Save [Example](https://github.com/MathGaron/py_rgbd_grabber/blob/master/tests/sensor_tests.py)
 ```python
     # instantiate Kinect2 or Realsense
     sensor = Kinect2()
-    # Inside the with statement, launch/release the sensor grabber process
-    with sensor:
+    # instantiate the recorder
+    recorder = VideoRecorder(save_path, fps, width, height)
+    # Inside the with statement, launch/release the async processes
+    with sensor, recorder:
         # Get the list of frames grabbed (empty list if there is no new frames)
         frames = sensor.get_frames()
         # Or pop the last frame (will block until next frame)
         frame = sensor.pop_frame()
+        # Send frame to recorder
+        recorder.save_frame(frame)
 ```
 
 Frame contains an rgb numpy array [H, W, C], depth (mm) numpy array [H, W] and timestamp (s)
