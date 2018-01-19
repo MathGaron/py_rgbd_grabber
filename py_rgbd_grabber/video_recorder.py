@@ -22,7 +22,6 @@ class VideoRecorder(RecorderBase):
         fourcc = cv2.VideoWriter_fourcc(*self.encoding)
         self.encoder = cv2.VideoWriter(self.path, fourcc, self.fps,
                               (self.width, self.height))
-        pass
 
     @abc.abstractmethod
     def clean_(self):

@@ -49,6 +49,4 @@ class Kinect2(SensorBase):
 
         depth_frame[depth_frame == float('inf')] = 0
 
-
-
         return RgbdFrame(rgb_frame, depth_frame, timestamp)

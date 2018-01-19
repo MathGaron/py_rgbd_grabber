@@ -30,7 +30,7 @@ class Realsense(SensorBase):
         self.serv.stop()
         self.device = None
 
-    def intrinsics(self):
+    def get_intrinsics(self):
         distortion = []
         for i in range(5):
             distortion.append(self.device.colour_intrinsics.coeffs[i])
