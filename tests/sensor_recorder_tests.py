@@ -7,13 +7,8 @@ import os
 from py_rgbd_grabber.video_recorder import VideoRecorder
 
 
-def preprocess_function(frame):
-    frame.rgb = cv2.pyrDown(frame.rgb)
-    frame.depth = cv2.pyrDown(frame.depth)
-    return frame
-
 if __name__ == '__main__':
-    sensor = Kinect2(preprocess_function)
+    sensor = Kinect2()
     #sensor = Realsense(preprocess_function)
 
     save_path = "test_save"

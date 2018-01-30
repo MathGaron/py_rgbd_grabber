@@ -7,13 +7,8 @@ import numpy as np
 import os
 
 
-def preprocess_function(frame):
-    frame.rgb = cv2.pyrDown(frame.rgb)
-    frame.depth = cv2.pyrDown(frame.depth)
-    return frame
-
 if __name__ == '__main__':
-    sensor = Realsense()
+    sensor = Kinect2()
 
     save_path = "test_save"
     if not os.path.exists(save_path):
@@ -25,7 +20,7 @@ if __name__ == '__main__':
         while True:
             start_time = time.time()
             frame = sensor.pop_frame()
-            print("grab time : {}".format(time.time() - start_time))
+            #print("grab time : {}".format(time.time() - start_time))
 
             # show and handle keyboard entries
             cv2.imshow("rgb", frame.rgb[:, :, ::-1])

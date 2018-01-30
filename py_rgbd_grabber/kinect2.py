@@ -1,10 +1,11 @@
 from py_rgbd_grabber.rgbd_frame import RgbdFrame
 from py_rgbd_grabber.sensorbase import SensorBase
+import numpy as np
 
 
 class Kinect2(SensorBase):
-    def __init__(self, preprocess_function=None, max_buffer_size=-1):
-        super(Kinect2, self).__init__(preprocess_function=preprocess_function, max_buffer_size=max_buffer_size)
+    def __init__(self, max_buffer_size=-1):
+        super(Kinect2, self).__init__(max_buffer_size=max_buffer_size)
 
     def initialize_(self):
         # boostrapping code in pyfreenect2 todo: fix this...
@@ -19,6 +20,7 @@ class Kinect2(SensorBase):
         self.device.setIrAndDepthFrameListener(self.frame_listener)
         success = self.device.start()
         self.registration = pyfreenect2.Registration(self.device)
+        self.color_buffer = np.zeros((1080, 1920, 3), dtype=np.uint8)
         return success
 
     def clean_(self):
@@ -37,16 +39,22 @@ class Kinect2(SensorBase):
 
     def get_frame_(self):
         import pyfreenect2
+        import time
         frames = self.frame_listener.waitForNewFrame()
         rgbFrame = frames.getFrame(pyfreenect2.Frame.COLOR)
         depthFrame = frames.getFrame(pyfreenect2.Frame.DEPTH)
         timestamp = depthFrame.getTimestamp()/10000
         (undistorted, color_registered, depth_registered) = self.registration.apply(rgbFrame=rgbFrame,
                                                                                     depthFrame=depthFrame)
+
         depth_frame = depth_registered.getDepthData().copy()
-        rgb_frame = rgbFrame.getRGBData()[:, :, :3][:, :, ::-1].copy()
+        time_start = time.time()
+        color_frame = rgbFrame.getRGBData()[:, :, :3]
+
+        print("Time {}".format(time.time() - time_start))
+
         self.frame_listener.release(frames)
 
         depth_frame[depth_frame == float('inf')] = 0
 
-        return RgbdFrame(rgb_frame, depth_frame, timestamp)
+        return RgbdFrame(self.color_buffer, depth_frame, timestamp)
