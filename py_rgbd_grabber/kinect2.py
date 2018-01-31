@@ -1,5 +1,6 @@
 from py_rgbd_grabber.rgbd_frame import RgbdFrame
 from py_rgbd_grabber.sensorbase import SensorBase
+import cv2
 import numpy as np
 
 
@@ -13,14 +14,14 @@ class Kinect2(SensorBase):
         self.serial_number = pyfreenect2.getDefaultDeviceSerialNumber()
         self.device = pyfreenect2.Freenect2Device(self.serial_number)
         self.frame_listener = pyfreenect2.SyncMultiFrameListener(pyfreenect2.Frame.COLOR,
-                                                                 pyfreenect2.Frame.IR,
                                                                  pyfreenect2.Frame.DEPTH)
 
         self.device.setColorFrameListener(self.frame_listener)
         self.device.setIrAndDepthFrameListener(self.frame_listener)
         success = self.device.start()
         self.registration = pyfreenect2.Registration(self.device)
-        self.color_buffer = np.zeros((1080, 1920, 3), dtype=np.uint8)
+        self.buffer_rgb = np.zeros((1080, 1920, 3), dtype=np.uint8)
+
         return success
 
     def clean_(self):
@@ -39,22 +40,21 @@ class Kinect2(SensorBase):
 
     def get_frame_(self):
         import pyfreenect2
-        import time
         frames = self.frame_listener.waitForNewFrame()
         rgbFrame = frames.getFrame(pyfreenect2.Frame.COLOR)
         depthFrame = frames.getFrame(pyfreenect2.Frame.DEPTH)
         timestamp = depthFrame.getTimestamp()/10000
         (undistorted, color_registered, depth_registered) = self.registration.apply(rgbFrame=rgbFrame,
                                                                                     depthFrame=depthFrame)
-
         depth_frame = depth_registered.getDepthData().copy()
-        time_start = time.time()
-        color_frame = rgbFrame.getRGBData()[:, :, :3]
+        rgb_frame = rgbFrame.getRGBData()
 
-        print("Time {}".format(time.time() - time_start))
+        self.buffer_rgb[:, :, 2] = rgb_frame[:, :, 0]
+        self.buffer_rgb[:, :, 1] = rgb_frame[:, :, 1]
+        self.buffer_rgb[:, :, 0] = rgb_frame[:, :, 2]
 
         self.frame_listener.release(frames)
 
         depth_frame[depth_frame == float('inf')] = 0
 
-        return RgbdFrame(self.color_buffer, depth_frame, timestamp)
+        return RgbdFrame(self.buffer_rgb, depth_frame, timestamp)
