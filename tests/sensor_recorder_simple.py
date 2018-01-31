@@ -17,10 +17,12 @@ if __name__ == '__main__':
             start_time = time.time()
             frame = sensor.pop_frame()
 
-            print("FPS : {}".format(1./(time.time() - start_time)))
             # show and handle keyboard entries
-            cv2.imshow("rgb", frame.rgb[:, :, ::-1])
-            cv2.imshow("depth", (frame.depth/np.max(frame.depth)*255).astype(np.uint8))
+            rgb = cv2.resize(frame.rgb, (int(frame.rgb.shape[1]/2), int(frame.rgb.shape[0]/2)))
+            depth = cv2.resize(frame.depth, (int(frame.depth.shape[1]/2), int(frame.depth.shape[0]/2)))
+            cv2.imshow("rgb", rgb[:, :, ::-1])
+            cv2.imshow("depth", (depth/np.max(depth)*255).astype(np.uint8))
             key = cv2.waitKey(1)
             if key == 1048603:  # ESC
                 break
+            print("FPS : {}".format(1./(time.time() - start_time)))

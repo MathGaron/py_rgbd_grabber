@@ -61,5 +61,6 @@ class Kinect2(SensorBase):
         self.frame_listener.release(frames)
 
         depth_frame[depth_frame == float('inf')] = 0
+        depth_frame = depth_frame[:, ::-1]
 
         return RgbdFrame(self.buffer_rgb, depth_frame, timestamp)
