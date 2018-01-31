@@ -46,12 +46,17 @@ class Kinect2(SensorBase):
         timestamp = depthFrame.getTimestamp()/10000
         (undistorted, color_registered, depth_registered) = self.registration.apply(rgbFrame=rgbFrame,
                                                                                     depthFrame=depthFrame)
+
+        #import time
+        #time_start = time.time()
         depth_frame = depth_registered.getDepthData().copy()
         rgb_frame = rgbFrame.getRGBData()
 
-        self.buffer_rgb[:, :, 2] = rgb_frame[:, :, 0]
-        self.buffer_rgb[:, :, 1] = rgb_frame[:, :, 1]
-        self.buffer_rgb[:, :, 0] = rgb_frame[:, :, 2]
+        self.buffer_rgb[:, :, 2] = rgb_frame[:, ::-1, 0]
+        self.buffer_rgb[:, :, 1] = rgb_frame[:, ::-1, 1]
+        self.buffer_rgb[:, :, 0] = rgb_frame[:, ::-1, 2]
+
+        #print("Time {}".format(time_start - time.time()))
 
         self.frame_listener.release(frames)
 
