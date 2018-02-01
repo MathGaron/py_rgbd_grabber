@@ -5,9 +5,16 @@ import numpy as np
 
 
 class SwapBuffer:
+    """
+    Basic tool to have a double buffer, while when is being written, the other is used...
+    """
     def __init__(self, height, width, channels, type):
-        self.swap_buffer = [np.zeros((height, width, channels), dtype=type),
-                            np.zeros((height, width, channels), dtype=type)]
+        if channels == 1:
+            self.swap_buffer = [np.zeros((height, width), dtype=type),
+                                np.zeros((height, width), dtype=type)]
+        else:
+            self.swap_buffer = [np.zeros((height, width, channels), dtype=type),
+                                np.zeros((height, width, channels), dtype=type)]
 
     def get_fill_buffer(self):
         return self.swap_buffer[0]
@@ -37,6 +44,7 @@ class Kinect2(SensorBase):
         self.registration = pyfreenect2.Registration(self.device)
 
         self.buffer_rgb = SwapBuffer(1080, 1920, 3, np.uint8)
+        self.buffer_depth = SwapBuffer(1082, 1920, 1, np.float32)
 
         return success
 
@@ -62,23 +70,23 @@ class Kinect2(SensorBase):
         timestamp = depthFrame.getTimestamp()/10000
         (undistorted, color_registered, depth_registered) = self.registration.apply(rgbFrame=rgbFrame,
                                                                                     depthFrame=depthFrame)
-
-        #import time
-        #time_start = time.time()
-        depth_frame = depth_registered.getDepthData().copy()
+        depth_frame = depth_registered.getDepthData()
         rgb_frame = rgbFrame.getRGBData()
 
+        # Minor optimisation, copy data directly in a preallocated buffer.
+
+        buffer = self.buffer_depth.get_fill_buffer()
+        buffer[:, :] = depth_frame[:, ::-1]
+        buffer[buffer == float('inf')] = 0
+        self.buffer_depth.swap()
+
         buffer = self.buffer_rgb.get_fill_buffer()
+        # channel wise copy save us some time with stride required by the channel and column flip...
         buffer[:, :, 2] = rgb_frame[:, ::-1, 0]
         buffer[:, :, 1] = rgb_frame[:, ::-1, 1]
         buffer[:, :, 0] = rgb_frame[:, ::-1, 2]
         self.buffer_rgb.swap()
 
-        #print("Time {}".format(time_start - time.time()))
-
         self.frame_listener.release(frames)
 
-        depth_frame[depth_frame == float('inf')] = 0
-        depth_frame = depth_frame[:, ::-1]
-
-        return RgbdFrame(self.buffer_rgb.get_read_buffer(), depth_frame, timestamp)
+        return RgbdFrame(self.buffer_rgb.get_read_buffer(), self.buffer_depth.get_read_buffer(), timestamp)
