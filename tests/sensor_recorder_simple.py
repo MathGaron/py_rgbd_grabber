@@ -1,4 +1,4 @@
-from py_rgbd_grabber.realsense import Realsense
+#from py_rgbd_grabber.realsense import Realsense
 
 from py_rgbd_grabber.kinect2 import Kinect2
 import time
