@@ -49,6 +49,8 @@ class Kinect2(SensorBase):
         rgb_frame = rgbFrame.getRGBData()
 
         depth = depth_frame[:, ::-1].copy()
+        # depth offset : https://github.com/OpenKinect/libfreenect2/issues/144
+        depth += 24
         # flip x axis, and flip channels
         rgb = rgb_frame[:, ::-1, :3][:, :, ::-1].copy()
 
