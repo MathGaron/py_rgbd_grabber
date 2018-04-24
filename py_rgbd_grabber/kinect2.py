@@ -42,6 +42,7 @@ class Kinect2(SensorBase):
         frames = self.frame_listener.waitForNewFrame()
         rgbFrame = frames.getFrame(pyfreenect2.Frame.COLOR)
         depthFrame = frames.getFrame(pyfreenect2.Frame.DEPTH)
+        # todo, should return both timemstamp (depth + rgb)
         timestamp = rgbFrame.getTimestamp() * 0.000125  # Unit 0.125 millisecond see libfreenect frame_listener.hpp
         (undistorted, color_registered, depth_registered) = self.registration.apply(rgbFrame=rgbFrame,
                                                                                     depthFrame=depthFrame)
@@ -51,7 +52,7 @@ class Kinect2(SensorBase):
         depth = depth_frame[:, ::-1].copy()
         # depth offset : https://github.com/OpenKinect/libfreenect2/issues/144
         # todo, add my calibration code in this repo
-        # depth += 20
+        # depth += depth * a + b
 
         # flip x axis, and flip channels
         rgb = rgb_frame[:, ::-1, :3][:, :, ::-1].copy()
