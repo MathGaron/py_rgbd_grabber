@@ -42,7 +42,7 @@ class Kinect2(SensorBase):
         frames = self.frame_listener.waitForNewFrame()
         rgbFrame = frames.getFrame(pyfreenect2.Frame.COLOR)
         depthFrame = frames.getFrame(pyfreenect2.Frame.DEPTH)
-        timestamp = depthFrame.getTimestamp() * 0.000125  # Unit 0.125 millisecond see libfreenect frame_listener.hpp
+        timestamp = rgbFrame.getTimestamp() * 0.000125  # Unit 0.125 millisecond see libfreenect frame_listener.hpp
         (undistorted, color_registered, depth_registered) = self.registration.apply(rgbFrame=rgbFrame,
                                                                                     depthFrame=depthFrame)
         depth_frame = depth_registered.getDepthData()
